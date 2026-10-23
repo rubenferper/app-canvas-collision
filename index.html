@@ -1,0 +1,412 @@
+
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>NEON SPACE | Cazador de Gemas</title>
+
+    <style>
+        :root {
+            --fondo: #050b1b;
+            --panel: #0b1630;
+            --cian: #00f5ff;
+            --azul: #287bff;
+            --texto: #eafaff;
+            --muted: #8ba8c9;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            color: var(--texto);
+            font-family: "Segoe UI", Arial, sans-serif;
+            background:
+                radial-gradient(ellipse at 50% 0%, #102a55 0%, transparent 50%),
+                linear-gradient(160deg, #050b1b, #071126 55%, #0b0b25);
+        }
+
+        button {
+            font: inherit;
+        }
+
+        .pagina {
+            width: min(1120px, 94%);
+            margin: auto;
+            padding: 28px 0;
+        }
+
+        .encabezado {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .etiqueta {
+            display: inline-block;
+            color: var(--cian);
+            border: 1px solid #00f5ff55;
+            background: #00f5ff0c;
+            border-radius: 30px;
+            padding: 7px 14px;
+            font-size: 11px;
+            letter-spacing: 3px;
+            font-weight: bold;
+        }
+
+        h1 {
+            margin: 15px 0 8px;
+            font-size: clamp(30px, 5vw, 48px);
+            letter-spacing: 3px;
+            line-height: 1.1;
+            text-shadow: 0 0 22px #00eaff66;
+        }
+
+        h1 span {
+            color: var(--cian);
+        }
+
+        .subtitulo {
+            color: var(--muted);
+            margin: 0;
+            font-size: 14px;
+        }
+
+        .panel {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+
+        .tarjeta {
+            min-width: 0;
+            padding: 16px;
+            border: 1px solid #2c5078;
+            border-radius: 13px;
+            background: linear-gradient(145deg, #0d1d39, #081329);
+            box-shadow: inset 0 1px #ffffff08;
+        }
+
+        .tarjeta small {
+            display: block;
+            color: var(--muted);
+            font-size: 10px;
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+        }
+
+        .valor {
+            font-size: clamp(21px, 3vw, 30px);
+            font-weight: 800;
+            color: var(--cian);
+        }
+
+        #nivel {
+            color: #83b8ff;
+            font-size: 19px;
+        }
+
+        .unidad {
+            color: var(--muted);
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        .juego {
+            overflow: hidden;
+            border: 1px solid #00d9ff99;
+            border-radius: 17px;
+            background: #050b1b;
+            box-shadow:
+                0 0 12px #00d9ff25,
+                0 0 45px #176bff12,
+                inset 0 0 20px #00d9ff0a;
+        }
+
+        .barra-juego {
+            min-height: 52px;
+            padding: 12px 17px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            border-bottom: 1px solid #1b4265;
+            background: #0a1630;
+        }
+
+        .estado {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            color: #a9c8e8;
+            font-size: 12px;
+        }
+
+        .punto {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--cian);
+            box-shadow: 0 0 12px var(--cian);
+        }
+
+        #estadoTexto {
+            letter-spacing: 1px;
+        }
+
+        .cantidad {
+            color: var(--cian);
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .canvas-contenedor {
+            position: relative;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 560px;
+            cursor: crosshair;
+            touch-action: manipulation;
+        }
+
+        .mensaje-pausa {
+            position: absolute;
+            inset: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 10px;
+            background: #04091bd9;
+            backdrop-filter: blur(5px);
+            text-align: center;
+            pointer-events: none;
+        }
+
+        .mensaje-pausa.visible {
+            display: flex;
+        }
+
+        .mensaje-pausa strong {
+            font-size: 30px;
+            color: var(--cian);
+            letter-spacing: 4px;
+            text-shadow: 0 0 18px #00eaff88;
+        }
+
+        .mensaje-pausa span {
+            color: #b8cde8;
+            font-size: 13px;
+        }
+
+        .controles {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            padding: 18px;
+            border-top: 1px solid #1b4265;
+            background: #08142b;
+        }
+
+        .boton {
+            border: 1px solid #00eaff99;
+            border-radius: 9px;
+            padding: 11px 22px;
+            color: var(--cian);
+            background: #0b2440;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 13px;
+            transition: 0.2s;
+        }
+
+        .boton:hover {
+            background: #103454;
+            box-shadow: 0 0 18px #00eaff22;
+            transform: translateY(-1px);
+        }
+
+        .boton-principal {
+            color: #03101e;
+            background: linear-gradient(100deg, #00f5ff, #4b9dff);
+            border-color: transparent;
+        }
+
+        .boton-principal:hover {
+            color: #03101e;
+            background: linear-gradient(100deg, #75fbff, #7ab7ff);
+        }
+
+        .ayuda {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .ayuda-item {
+            text-align: center;
+            padding: 14px 8px;
+            border: 1px solid #1a3658;
+            border-radius: 10px;
+            background: #09152a99;
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .ayuda-item strong {
+            display: block;
+            color: #bdefff;
+            margin-bottom: 5px;
+            font-size: 13px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 25px 0 0;
+            color: #6684a8;
+            font-size: 11px;
+            letter-spacing: 1px;
+        }
+
+        @media (max-width: 600px) {
+            .pagina {
+                width: 94%;
+                padding-top: 20px;
+            }
+
+            .panel {
+                gap: 7px;
+            }
+
+            .tarjeta {
+                padding: 12px 8px;
+            }
+
+            .tarjeta small {
+                font-size: 9px;
+                letter-spacing: 1px;
+            }
+
+            canvas {
+                height: 480px;
+            }
+
+            .barra-juego {
+                padding: 12px 10px;
+            }
+
+            .controles {
+                padding: 13px 8px;
+                gap: 8px;
+            }
+
+            .boton {
+                padding: 10px 13px;
+                font-size: 12px;
+            }
+
+            .ayuda {
+                grid-template-columns: 1fr;
+                gap: 7px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <main class="pagina">
+
+        <header class="encabezado">
+            <div class="etiqueta">ARCADE INTERACTIVO · 2D</div>
+            <h1>NEON <span>SPACE</span></h1>
+            <p class="subtitulo">
+                Atrapa las gemas de energía y conquista la galaxia.
+            </p>
+        </header>
+
+        <section class="panel">
+            <div class="tarjeta">
+                <small>PUNTUACIÓN</small>
+                <div class="valor" id="marcador">000</div>
+                <div class="unidad">Gemas atrapadas</div>
+            </div>
+
+            <div class="tarjeta">
+                <small>NIVEL DE VELOCIDAD</small>
+                <div class="valor" id="nivel">INICIAL</div>
+                <div class="unidad" id="velocidadTexto">Velocidad x1.0</div>
+            </div>
+
+            <div class="tarjeta">
+                <small>OBJETOS ACTIVOS</small>
+                <div class="valor" id="cantidad">25 / 25</div>
+                <div class="unidad">Gemas en el espacio</div>
+            </div>
+        </section>
+
+        <section class="juego">
+            <div class="barra-juego">
+                <div class="estado">
+                    <span class="punto" id="puntoEstado"></span>
+                    <span id="estadoTexto">SISTEMA ACTIVO</span>
+                </div>
+
+                <span class="cantidad">● LIVE CANVAS</span>
+            </div>
+
+            <div class="canvas-contenedor">
+                <canvas id="canvas" aria-label="Juego para atrapar gemas"></canvas>
+
+                <div class="mensaje-pausa" id="mensajePausa">
+                    <strong>PAUSA</strong>
+                    <span>El universo está en espera.</span>
+                </div>
+            </div>
+
+            <div class="controles">
+                <button class="boton boton-principal" id="botonPausa" type="button">
+                    ❚❚ Pausar
+                </button>
+
+                <button class="boton" id="botonReiniciar" type="button">
+                    ↻ Reiniciar juego
+                </button>
+            </div>
+        </section>
+
+        <section class="ayuda">
+            <div class="ayuda-item">
+                <strong>✦ OBJETIVO</strong>
+                Haz clic izquierdo en las gemas.
+            </div>
+
+            <div class="ayuda-item">
+                <strong>⚡ NIVEL MEDIO</strong>
+                Al superar 10 puntos.
+            </div>
+
+            <div class="ayuda-item">
+                <strong>✧ NIVEL ALTO</strong>
+                Al superar 20 puntos.
+            </div>
+        </section>
+
+        <footer>
+            ACTIVIDAD 2.5 · INTERACTIVIDAD EN ESCENARIOS GRÁFICOS 2D
+        </footer>
+    </main>
+
+    <script src="colision.js"></script>
+</body>
+</html>
